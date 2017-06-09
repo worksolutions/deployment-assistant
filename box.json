@@ -1,0 +1,15 @@
+{
+  "blacklist": [],
+  "directories": [
+    "src",
+    "bin",
+    "vendor"
+  ],
+  "files": [
+    "config.yml"
+  ],
+  "main": "bin/main.php",
+  "output": "build/dep.phar",
+  "chmod": "0755",
+  "stub": true
+}

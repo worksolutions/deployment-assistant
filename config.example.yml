@@ -1,0 +1,6 @@
+update:
+  phar_url: "http://host/dep.phar"
+  sum_url: "http://host/dep.md5.txt"
+
+sentry:
+  dsn: "https://key:secret@sentry.io/project"

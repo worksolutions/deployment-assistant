@@ -1,0 +1,8 @@
+# Created by .ignore support plugin (hsz.mobi)
+.DS_store
+.idea/
+vendor/
+stub/
+composer.phar
+config.yml
+composer.lock
