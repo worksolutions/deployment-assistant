@@ -36,7 +36,7 @@ This situation can cause conflicts. Resolution:
 
 - Make sure that the developer has the latest version of the changes 
 on the local computer that he wants to deploy on the production server.
-- Push the changes to the remote repository with the -f (force) flag wiping the developer's changes in the repository
+- Push the changes from production server to the remote repository with the -f (force) flag wiping the developer's changes in the repository
 - Accept changes from the production server locally and resolve conflicts if they appeared
 - Push changes from the local computer to the remote repository
 - Try to deploy again 
