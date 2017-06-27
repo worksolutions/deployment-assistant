@@ -40,24 +40,28 @@ class DeployTest extends TestCase
         $this->assertContains('Checking that the work dir has no changes...fatal',
             $this->runCommand('deploy'));
 
-        Cmd::run('rm test2', $workdir);
-        Cmd::run('touch test3', $workdir);
-        Cmd::run('git add test3', $workdir);
+        Cmd::run('git add test2', $workdir);
         Cmd::run('git commit -m "second commit"', $workdir);
-        $output = $this->runCommand('deploy');
-        $this->assertContains('Checking that the work dir has no changes...ok', $output);
-        $this->assertContains('Checking that the local branch is not ahead of remote branch...fatal', $output);
-
         Cmd::run('git push origin master', $workdir);
         Cmd::run('git reset --hard HEAD~1', $workdir);
-        Cmd::run('touch test4', $workdir);
+        Cmd::run('touch test3', $workdir);
         Cmd::run('git add .', $workdir);
         Cmd::run('git commit -m "another second commit"', $workdir);
         $output = $this->runCommand('deploy');
         $this->assertContains('Checking that the work dir has no changes...ok', $output);
-        $this->assertContains('Checking that the local branch is not ahead of remote branch...ok', $output);
         $this->assertContains('Checking that the local branch and remote branch are both modified...fatal', $output);
 
+        Cmd::run('git reset --hard HEAD~1', $workdir);
+        Cmd::run('git pull origin master', $workdir);
+        Cmd::run('touch test5', $workdir);
+        Cmd::run('git add test5', $workdir);
+        Cmd::run('git commit -m "third commit"', $workdir);
+        $output = $this->runCommand('deploy');
+        $this->assertContains('Checking that the work dir has no changes...ok', $output);
+        $this->assertContains('Checking that the local branch and remote branch are both modified...ok', $output);
+        $this->assertContains('Checking that the local branch is not ahead of remote branch...fatal', $output);
+
+        Cmd::run('git push origin master', $workdir);
         Cmd::run('git reset --hard HEAD~1', $workdir);
         $output = $this->runCommand('deploy');
         $this->assertContains('Checking that the work dir has no changes...ok', $output);

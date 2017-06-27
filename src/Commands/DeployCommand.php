@@ -67,22 +67,23 @@ class DeployCommand extends Command
             $gitHelper->fetchRemoteRepo('origin');
         });
 
-        $this->doPart($output, 'Checking that the local branch is not ahead of remote branch',
-            function() use ($gitHelper, $remoteName, $branchName) {
-                if ($gitHelper->isLocalRepoAheadRemoteRepo($remoteName, $branchName)) {
-                    throw new RuntimeException('Your local branch is ahead of remote branch. Please push your changes to remote');
-                }
-            });
 
         $this->doPart($output, 'Checking that the local branch and remote branch are both modified',
             function () use ($gitHelper, $remoteName, $branchName) {
                 if ($gitHelper->isLocalBranchAndRemoteBranchBothModified($remoteName, $branchName)) {
                     throw new RuntimeException(
-'The local branch and remote branch are both modified.
+                        'The local branch and remote branch are both modified.
 There is risk of conflicts while deploying. 
 
 Please push production changes to remote branch with force parameter, then pull changes locally, 
 then resolve conflicts and try to deploy again.');
+                }
+            });
+
+        $this->doPart($output, 'Checking that the local branch is not ahead of remote branch',
+            function() use ($gitHelper, $remoteName, $branchName) {
+                if ($gitHelper->isLocalRepoAheadRemoteRepo($remoteName, $branchName)) {
+                    throw new RuntimeException('Your local branch is ahead of remote branch. Please push your changes to remote');
                 }
             });
 
