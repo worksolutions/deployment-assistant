@@ -17,7 +17,7 @@
 
 В этом случае разработчику будет возвращено сообщение об ошибке развертывания:
 
-    Work dir is not clean. Please commit changes
+>Work dir is not clean. Please commit changes
 
 Разработчик должен зафиксировать изменения на боевом сервере, вытолкнуть их в удаленный репозиторий
 и повторить попытку развертывания
@@ -26,11 +26,11 @@
 
 В этом случае разработчику будет возвращено сообщение об ошибке развертывания:
 
-    The local branch and remote branch are both modified.
-    There is risk of conflicts while deploying. 
-    
-    Please push production changes to remote branch with force parameter, then pull changes locally, 
-    then resolve conflicts and try to deploy again.
+>The local branch and remote branch are both modified.
+>There is risk of conflicts while deploying. 
+>   
+>Please push production changes to remote branch with force parameter, then pull changes locally, 
+>then resolve conflicts and try to deploy again.
 
 Данная ситуация может привести к возникновлению конфликтов. Порядок решения:
 
@@ -46,7 +46,7 @@
 
 В этом случае разработчику будет возвращено сообщение об ошибке развертывания:
 
-    Your local branch is ahead of remote branch. Please push your changes to remote
+>Your local branch is ahead of remote branch. Please push your changes to remote
 
 Разработчик должен вытолкнуть изменения с боевого сервера в удаленный репозиторий
 и повторить попытку развертывания
@@ -55,7 +55,7 @@
 
 В этом случае разработчику будет возвращено сообщение об ошибке развертывания:
 
-    There are nothing to pull
+>There are nothing to pull
 
 Разработчик должен вытолкнуть изменения с локального компьютера в удаленный репозиторий
 и повторить попытку развертывания

@@ -17,7 +17,7 @@ due to conflicts during the deployment of the next release.
 
 In this case, the developer will receive a deployment error message:
 
-    Work dir is not clean. Please commit changes
+>Work dir is not clean. Please commit changes
 
 The developer must commit the changes on the production server, 
 push them to the remote repository and retry the deployment
@@ -26,11 +26,11 @@ push them to the remote repository and retry the deployment
 
 In this case, the developer will receive a deployment error message:
 
-    The local branch and remote branch are both modified.
-    There is risk of conflicts while deploying. 
-    
-    Please push production changes to remote branch with force parameter, then pull changes locally, 
-    then resolve conflicts and try to deploy again.
+>The local branch and remote branch are both modified.
+>There is risk of conflicts while deploying. 
+>    
+>Please push production changes to remote branch with force parameter, then pull changes locally, 
+>then resolve conflicts and try to deploy again.
 
 This situation can cause conflicts. Resolution:
 
@@ -46,7 +46,7 @@ on the local computer that he wants to deploy on the production server.
 
 In this case, the developer will receive a deployment error message:
 
-    Your local branch is ahead of remote branch. Please push your changes to remote
+>Your local branch is ahead of remote branch. Please push your changes to remote
 
 The developer must push the changes from the production server to 
 the remote repository and try to deploy again
@@ -55,7 +55,7 @@ the remote repository and try to deploy again
 
 In this case, the developer will receive a deployment error message:
 
-    There are nothing to pull
+>There are nothing to pull
 
 The developer must push the changes from the local computer 
 to the remote repository and try to deploy again
