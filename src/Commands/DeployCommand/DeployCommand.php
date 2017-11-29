@@ -1,8 +1,9 @@
 <?php
 
-namespace WS\DeploymentAssistant\Commands;
+namespace WS\DeploymentAssistant\Commands\DeployCommand;
+use FilesystemIterator;
+use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -11,7 +12,7 @@ use WS\DeploymentAssistant\Helpers\VersionHelper;
 
 /**
  * Class DeployCommand
- * @package WS\DeployAssistant\Commands
+ * @package WS\DeployAssistant\Commands\DeployCommand
  */
 class DeployCommand extends Command
 {
@@ -47,56 +48,29 @@ class DeployCommand extends Command
      * @throws \Symfony\Component\Console\Exception\LogicException
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      * @throws \Symfony\Component\Console\Exception\RuntimeException
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var GitHelper $gitHelper */
         $gitHelper = $this->getHelper(GitHelper::NAME);
-        $gitHelper->setOutput($output);
 
         $remoteName = $input->getArgument('remote');
         $branchName = $input->getArgument('branch');
 
-        $this->doPart($output, 'Checking that the work dir has no changes', function() use ($gitHelper) {
-            if ($gitHelper->isWorkDirHasNotCommitChanges()) {
-                throw new RuntimeException('Work dir is not clean. Please commit changes');
-            }
-        });
+        $this->runHooksFromDir($input, $output, __DIR__ . '/../../../hooks/pre_fetch');
 
         $this->doPart($output, 'Fetching remote repo', function() use ($gitHelper) {
             $gitHelper->fetchRemoteRepo('origin');
         });
 
-
-        $this->doPart($output, 'Checking that the local branch and remote branch are both modified',
-            function () use ($gitHelper, $remoteName, $branchName) {
-                if ($gitHelper->isLocalBranchAndRemoteBranchBothModified($remoteName, $branchName)) {
-                    throw new RuntimeException(
-                        'The local branch and remote branch are both modified.
-There is risk of conflicts while deploying. 
-
-Please push production changes to remote branch with force parameter, then pull changes locally, 
-then resolve conflicts and try to deploy again.');
-                }
-            });
-
-        $this->doPart($output, 'Checking that the local branch is not ahead of remote branch',
-            function() use ($gitHelper, $remoteName, $branchName) {
-                if ($gitHelper->isLocalRepoAheadRemoteRepo($remoteName, $branchName)) {
-                    throw new RuntimeException('Your local branch is ahead of remote branch. Please push your changes to remote');
-                }
-            });
-
-        $this->doPart($output, 'Checking that the local branch is behind of remote branch',
-            function() use ($gitHelper, $remoteName, $branchName) {
-                if (!$gitHelper->isLocalRepoBehindOfRemoteRepo($remoteName, $branchName)) {
-                    throw new RuntimeException('There are nothing to pull');
-                }
-            });
+        $this->runHooksFromDir($input, $output, __DIR__ . '/../../../hooks/post_fetch');
 
         $this->doPart($output, 'Pulling changes', function() use ($gitHelper, $remoteName, $branchName) {
             $gitHelper->pullChanges($remoteName, $branchName);
         });
+
+        $this->runHooksFromDir($input, $output, __DIR__ . '/../../../hooks/post_deploy');
     }
 
     private function doPart(OutputInterface $output, $message, $func)
@@ -108,7 +82,55 @@ then resolve conflicts and try to deploy again.');
             $output->writeln('<info>ok</info>');
         } catch (\Exception $e) {
             $output->writeln('<error>fatal</error>');
+            /** @noinspection PhpUnhandledExceptionInspection */
             throw $e;
+        }
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @param $dir
+     * @throws \Exception
+     */
+    private function runHooksFromDir(InputInterface $input, OutputInterface $output, $dir)
+    {
+        $iterator = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS);
+
+        $files = array();
+        foreach ($iterator as $file) {
+            /** @var SplFileInfo $file */
+
+            if ($file->isDir()) {
+                continue;
+            }
+
+            if ($file->getExtension() !== "php") {
+                continue;
+            }
+
+            $files[] = $file;
+        }
+
+        usort($files, function(SplFileInfo $a, SplFileInfo $b) {
+            return $a->getBasename() > $b->getBasename();
+        });
+
+        foreach ($files as $file) {
+            $hookClassName = $file->getBasename('.php');
+
+            if (!class_exists($hookClassName)) {
+                /** @noinspection PhpIncludeInspection */
+                require $file->getPathname();
+            }
+
+            /** @var DeployCommandHook $hook */
+            $hook = new $hookClassName;
+            $hook->setHelperSet($this->getHelperSet());
+
+            $this->doPart($output, $hook->getTitle(), function () use ($hook, $input, $output) {
+                $hook->run($input, $output);
+            });
         }
     }
 }
