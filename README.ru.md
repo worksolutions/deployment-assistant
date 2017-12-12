@@ -84,13 +84,13 @@ Phar-архив помощника скачается и сохранится в
 Синтаксис команды развертывания:
 
 ```bash
-php ./dep.phar deploy [<remote>] [<branch>]
+php -d disable_functions="" ./dep.phar deploy [<remote>] [<branch>]
 ```
 
 Для запуска процесса развертывания введите:
 
 ```bash
-php ./dep.phar deploy
+php -d disable_functions="" ./dep.phar deploy
 ```
 
 По умолчанию изменения вытянутся из удаленной ветки `origin/master`, 
@@ -98,7 +98,7 @@ php ./dep.phar deploy
 нужно вытянуть изменения:
 
 ```bash
-php ./dep.phar deploy origin master
+php -d disable_functions="" ./dep.phar deploy origin master
 ```
 
 ### Обновление
@@ -106,7 +106,7 @@ php ./dep.phar deploy origin master
 Команда обновления проверит есть ли новая версия помощника и, если есть – обновит его.
 
 ```bash
-php ./dep.phar self-update
+php -d disable_functions="" ./dep.phar self-update
 ```
 
 ## Внести вклад
