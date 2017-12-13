@@ -27,12 +27,16 @@ class hook10_apply_migrations extends DeployCommandHook {
             return;
         }
 
+        $output = clone $this->getOutput();
+        $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
+
         $this->getOutput()->writeln('');
-        $this->execCmd(
+        $this->getExecHelper()->exec(
+            $output,
             'php ' . $migrateTool . ' apply -f --skip-optional',
             null,
             null,
-            OutputInterface::VERBOSITY_VERY_VERBOSE
+            OutputInterface::VERBOSITY_QUIET
         );
     }
 }
