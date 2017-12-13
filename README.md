@@ -73,7 +73,7 @@
 Для установки введите команду:
 
 ```bash
-php -r "copy('http://dep.worksolutions.ru/dep.phar', 'dep.phar');"
+php -d allow_url_fopen=1 -r "copy('http://dep.worksolutions.ru/dep.phar', 'dep.phar');"
 chmod +x ./dep.phar
 ```
 
