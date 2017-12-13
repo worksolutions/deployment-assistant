@@ -27,6 +27,8 @@ class hook10_apply_migrations extends DeployCommandHook {
             return;
         }
 
+        $this->setResult(false);
+
         $output = clone $this->getOutput();
         $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
 
