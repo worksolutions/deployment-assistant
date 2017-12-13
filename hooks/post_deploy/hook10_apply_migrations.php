@@ -20,7 +20,7 @@ class hook10_apply_migrations extends DeployCommandHook {
     public function run()
     {
         $cwd = getcwd();
-        $migrateTool = $cwd . "/bitrix/module/tools/migrate";
+        $migrateTool = $cwd . "/bitrix/tools/migrate";
 
         if (!file_exists($migrateTool)) {
             $this->setResult('module is not installed');
