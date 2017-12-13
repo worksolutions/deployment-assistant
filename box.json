@@ -1,6 +1,7 @@
 {
   "blacklist": [],
   "directories": [
+    "hooks",
     "src",
     "bin",
     "vendor"

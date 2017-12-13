@@ -7,8 +7,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Yaml\Yaml;
 use WS\DeploymentAssistant\Commands\DeployCommand\DeployCommand;
 use WS\DeploymentAssistant\Commands\SelfUpdateCommand;
+use WS\DeploymentAssistant\Helpers\ExecHelper;
 use WS\DeploymentAssistant\Helpers\GitHelper;
-use WS\DeploymentAssistant\Helpers\ProcessHelper\ProcessHelper;
 use WS\DeploymentAssistant\Helpers\SentryHelper;
 use WS\DeploymentAssistant\Helpers\VersionHelper;
 use WS\DeploymentAssistant\Listeners\SentryExceptionListener;
@@ -27,8 +27,8 @@ class Application extends \Symfony\Component\Console\Application
 
         $config = $this->getConfig();
 
-        $this->getHelperSet()->set(new ProcessHelper());
         $this->getHelperSet()->set(new GitHelper());
+        $this->getHelperSet()->set(new ExecHelper());
 
         if (isset($config['sentry'])) {
             $this->getHelperSet()->set(new SentryHelper($config['sentry']));

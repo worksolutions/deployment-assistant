@@ -1,7 +1,5 @@
 <?php
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use WS\DeploymentAssistant\Commands\DeployCommand\DeployCommandHook;
 
 
@@ -20,15 +18,13 @@ class hook30_check_local_branch_is_behind_remote_branch extends DeployCommandHoo
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
      * @return void
      * @throws \WS\DeploymentAssistant\RuntimeException
      */
-    public function run(InputInterface $input, OutputInterface $output)
+    public function run()
     {
-        $remoteName = $input->getArgument('remote');
-        $branchName = $input->getArgument('branch');
+        $remoteName = $this->getInput()->getArgument('remote');
+        $branchName = $this->getInput()->getArgument('branch');
 
         if (!$this->isLocalRepoBehindOfRemoteRepo($remoteName, $branchName)) {
             throw new RuntimeException('There are nothing to pull');
@@ -42,8 +38,8 @@ class hook30_check_local_branch_is_behind_remote_branch extends DeployCommandHoo
      */
     public function isLocalRepoBehindOfRemoteRepo($remoteName, $remoteBranch)
     {
-        $currentBranch = $this->getGitHelper()->getCurrentBranch();
-        $result = trim($this->getProcessHelper()->run(
+        $currentBranch = $this->getCurrentBranch();
+        $result = trim($this->execCmd(
             "git rev-list --left-right --count {$currentBranch}...{$remoteName}/{$remoteBranch}"));
         $result = explode("\t", $result);
 

@@ -1,7 +1,5 @@
 <?php
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use WS\DeploymentAssistant\Commands\DeployCommand\DeployCommandHook;
 use WS\DeploymentAssistant\RuntimeException;
 
@@ -21,12 +19,10 @@ class hook20_check_work_dir_is_clean extends DeployCommandHook
 
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
      * @return void
      * @throws \WS\DeploymentAssistant\RuntimeException
      */
-    public function run(InputInterface $input, OutputInterface $output)
+    public function run()
     {
         if ($this->isWorkDirHasNotCommitChanges()) {
             throw new RuntimeException('Work dir is not clean. Please commit changes');
@@ -38,7 +34,6 @@ class hook20_check_work_dir_is_clean extends DeployCommandHook
      */
     private function isWorkDirHasNotCommitChanges()
     {
-        return strpos($this->getProcessHelper()
-                ->run('git status'), 'nothing to commit') === false;
+        return strpos($this->execCmd('git status'), 'nothing to commit') === false;
     }
 }

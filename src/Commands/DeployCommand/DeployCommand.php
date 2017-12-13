@@ -4,11 +4,14 @@ namespace WS\DeploymentAssistant\Commands\DeployCommand;
 use FilesystemIterator;
 use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use WS\DeploymentAssistant\Helpers\GitHelper;
 use WS\DeploymentAssistant\Helpers\VersionHelper;
+use WS\DeploymentAssistant\RuntimeException;
 
 /**
  * Class DeployCommand
@@ -19,8 +22,8 @@ class DeployCommand extends Command
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
-     * @throws \Symfony\Component\Console\Exception\LogicException
+     * @throws InvalidArgumentException
+     * @throws LogicException
      */
     public function interact(InputInterface $input, OutputInterface $output)
     {
@@ -45,9 +48,9 @@ class DeployCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int|null|void
-     * @throws \Symfony\Component\Console\Exception\LogicException
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
-     * @throws \Symfony\Component\Console\Exception\RuntimeException
+     * @throws LogicException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
      * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -58,19 +61,25 @@ class DeployCommand extends Command
         $remoteName = $input->getArgument('remote');
         $branchName = $input->getArgument('branch');
 
-        $this->runHooksFromDir($input, $output, __DIR__ . '/../../../hooks/pre_fetch');
+        $hooksDir = __DIR__ . '/../../../hooks';
 
-        $this->doPart($output, 'Fetching remote repo', function() use ($gitHelper) {
-            $gitHelper->fetchRemoteRepo('origin');
-        });
+        $this->runHooksFromDir($input, $output, $hooksDir . '/pre_fetch');
 
-        $this->runHooksFromDir($input, $output, __DIR__ . '/../../../hooks/post_fetch');
+        $this->doPart($output, 'Fetching remote repo',
+            function() use ($gitHelper, $output) {
+                $gitHelper->fetchRemoteRepo($output, 'origin');
+            }
+        );
 
-        $this->doPart($output, 'Pulling changes', function() use ($gitHelper, $remoteName, $branchName) {
-            $gitHelper->pullChanges($remoteName, $branchName);
-        });
+        $this->runHooksFromDir($input, $output, $hooksDir . '/post_fetch');
 
-        $this->runHooksFromDir($input, $output, __DIR__ . '/../../../hooks/post_deploy');
+        $this->doPart($output, 'Pulling changes',
+            function() use ($gitHelper, $remoteName, $branchName, $output) {
+                $gitHelper->pullChanges($output, $remoteName, $branchName);
+            }
+        );
+
+        $this->runHooksFromDir($input, $output, $hooksDir . '/post_deploy');
     }
 
     private function doPart(OutputInterface $output, $message, $func)
@@ -117,20 +126,33 @@ class DeployCommand extends Command
         });
 
         foreach ($files as $file) {
-            $hookClassName = $file->getBasename('.php');
-
-            if (!class_exists($hookClassName)) {
-                /** @noinspection PhpIncludeInspection */
-                require $file->getPathname();
-            }
-
-            /** @var DeployCommandHook $hook */
-            $hook = new $hookClassName;
-            $hook->setHelperSet($this->getHelperSet());
-
-            $this->doPart($output, $hook->getTitle(), function () use ($hook, $input, $output) {
-                $hook->run($input, $output);
-            });
+            $this->runHook($input, $output, $file);
         }
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @param SplFileInfo $file
+     * @throws \Exception
+     */
+    private function runHook(InputInterface $input, OutputInterface $output, SplFileInfo $file)
+    {
+        $hookClassName = $file->getBasename('.php');
+
+        if (!class_exists($hookClassName)) {
+            /** @noinspection PhpIncludeInspection */
+            require $file->getPathname();
+        }
+
+        /** @var DeployCommandHook $hook */
+        $hook = new $hookClassName;
+        $hook->setInput($input);
+        $hook->setOutput($output);
+        $hook->setHelperSet($this->getHelperSet());
+
+        $this->doPart($output, $hook->getTitle(), function () use ($hook) {
+            $hook->run();
+        });
     }
 }

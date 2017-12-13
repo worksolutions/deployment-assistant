@@ -1,8 +1,6 @@
 <?php
 
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use WS\DeploymentAssistant\Commands\DeployCommand\DeployCommandHook;
 use WS\DeploymentAssistant\RuntimeException;
@@ -22,15 +20,12 @@ class hook10_check_remote_and_local_branch_has_same_names extends DeployCommandH
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
      * @return void
-     * @throws RuntimeException
      */
-    public function run(InputInterface $input, OutputInterface $output)
+    public function run()
     {
-        $branchName = $input->getArgument('branch');
-        $currentBranch = $this->getGitHelper()->getCurrentBranch();
+        $branchName = $this->getInput()->getArgument('branch');
+        $currentBranch = $this->getCurrentBranch();
 
         /** @var QuestionHelper $questionHelper */
         $questionHelper = $this->getHelper('question');
@@ -42,7 +37,7 @@ class hook10_check_remote_and_local_branch_has_same_names extends DeployCommandH
         $question = new ConfirmationQuestion(
             'Local branch and remote branch has different names. Continue?', false);
 
-        if (!$questionHelper->ask($input, $output, $question)) {
+        if (!$questionHelper->ask($this->getInput(), $this->getOutput(), $question)) {
             throw new RuntimeException('Local branch and remote branch has different names');
         }
     }

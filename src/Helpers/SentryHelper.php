@@ -2,12 +2,8 @@
 
 namespace WS\DeploymentAssistant\Helpers;
 use Raven_Client;
-use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Helper\Helper;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use WS\DeploymentAssistant\Application;
-use WS\DeploymentAssistant\Listeners\SentryExceptionListener;
 
 /**
  * Class SentryHelper

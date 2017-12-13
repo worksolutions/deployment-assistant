@@ -2,7 +2,8 @@
 
 namespace WS\DeploymentAssistant\Helpers;
 use Symfony\Component\Console\Helper\Helper;
-use WS\DeploymentAssistant\Helpers\ProcessHelper\ProcessHelper;
+use Symfony\Component\Console\Helper\HelperInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use WS\DeploymentAssistant\RuntimeException;
 
 /**
@@ -24,39 +25,42 @@ class GitHelper extends Helper
     }
 
     /**
-     * @return \Symfony\Component\Console\Helper\HelperInterface|ProcessHelper
-     * @throws \WS\DeploymentAssistant\RuntimeException
+     * @return HelperInterface|ExecHelper
+     * @throws RuntimeException
      */
-    private function processHelper() {
+    private function execHelper() {
         if (!$this->getHelperSet()) {
             throw new RuntimeException("helperSet is not set");
         }
 
-        return $this->getHelperSet()->get(ProcessHelper::NAME);
+        return $this->getHelperSet()->get(ExecHelper::NAME);
     }
 
     /**
+     * @param OutputInterface $output
      * @param string $name
      */
-    public function fetchRemoteRepo($name)
+    public function fetchRemoteRepo(OutputInterface $output, $name)
     {
-        $this->processHelper()->run("git fetch {$name}");
+        $this->execHelper()->exec($output, "git fetch {$name}");
     }
 
     /**
+     * @param OutputInterface $output
      * @param string $origin
      * @param string $branch
      */
-    public function pullChanges($origin, $branch)
+    public function pullChanges(OutputInterface $output, $origin, $branch)
     {
-        $this->processHelper()->run("git pull {$origin} {$branch}");
+        $this->execHelper()->exec($output, "git pull {$origin} {$branch}");
     }
 
     /**
+     * @param OutputInterface $output
      * @return string
      */
-    public function getCurrentBranch()
+    public function getCurrentBranch(OutputInterface $output)
     {
-        return trim($this->processHelper()->run('git rev-parse --abbrev-ref HEAD'));
+        return trim($this->execHelper()->exec($output, 'git rev-parse --abbrev-ref HEAD'));
     }
 }

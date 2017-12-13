@@ -1,7 +1,5 @@
 <?php
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use WS\DeploymentAssistant\Commands\DeployCommand\DeployCommandHook;
 use WS\DeploymentAssistant\RuntimeException;
 
@@ -11,7 +9,6 @@ use WS\DeploymentAssistant\RuntimeException;
  */
 class hook20_check_local_branch_is_not_ahead_remote_branch extends DeployCommandHook
 {
-
     /**
      * @return string
      */
@@ -21,15 +18,13 @@ class hook20_check_local_branch_is_not_ahead_remote_branch extends DeployCommand
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
      * @return void
      * @throws \WS\DeploymentAssistant\RuntimeException
      */
-    public function run(InputInterface $input, OutputInterface $output)
+    public function run()
     {
-        $remoteName = $input->getArgument('remote');
-        $branchName = $input->getArgument('branch');
+        $remoteName = $this->getInput()->getArgument('remote');
+        $branchName = $this->getInput()->getArgument('branch');
 
         if ($this->isLocalRepoAheadRemoteRepo($remoteName, $branchName)) {
             throw new RuntimeException(
@@ -38,12 +33,14 @@ class hook20_check_local_branch_is_not_ahead_remote_branch extends DeployCommand
     }
 
     /**
+     * @param $remoteName string
+     * @param $remoteBranch string
      * @return bool
      */
     public function isLocalRepoAheadRemoteRepo($remoteName, $remoteBranch)
     {
-        $currentBranch = $this->getGitHelper()->getCurrentBranch();
-        $result = trim($this->getProcessHelper()->run(
+        $currentBranch = $this->getCurrentBranch();
+        $result = trim($this->execCmd(
             "git rev-list --left-right --count {$currentBranch}...{$remoteName}/{$remoteBranch}"));
         $result = explode("\t", $result);
 

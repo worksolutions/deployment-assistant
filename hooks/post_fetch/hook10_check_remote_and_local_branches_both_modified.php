@@ -1,7 +1,5 @@
 <?php
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use WS\DeploymentAssistant\Commands\DeployCommand\DeployCommandHook;
 use WS\DeploymentAssistant\RuntimeException;
 
@@ -21,15 +19,13 @@ class hook10_check_remote_and_local_branches_both_modified extends DeployCommand
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
      * @return void
      * @throws \WS\DeploymentAssistant\RuntimeException
      */
-    public function run(InputInterface $input, OutputInterface $output)
+    public function run()
     {
-        $remoteName = $input->getArgument('remote');
-        $branchName = $input->getArgument('branch');
+        $remoteName = $this->getInput()->getArgument('remote');
+        $branchName = $this->getInput()->getArgument('branch');
 
         if ($this->isLocalBranchAndRemoteBranchBothModified($remoteName, $branchName)) {
             throw new RuntimeException(
@@ -43,8 +39,8 @@ then resolve conflicts and try to deploy again.');
 
     private function isLocalBranchAndRemoteBranchBothModified($remoteName, $branchName)
     {
-        $currentBranch = $this->getGitHelper()->getCurrentBranch();
-        $result = trim($this->getProcessHelper()->run(
+        $currentBranch = $this->getCurrentBranch();
+        $result = trim($this->execCmd(
             "git rev-list --left-right --count {$currentBranch}...{$remoteName}/{$branchName}"));
         $result = explode("\t", $result);
 
