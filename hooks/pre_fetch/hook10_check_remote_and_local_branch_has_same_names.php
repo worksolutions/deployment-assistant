@@ -16,7 +16,7 @@ class hook10_check_remote_and_local_branch_has_same_names extends DeployCommandH
      */
     public function getTitle()
     {
-        return 'Checking is remote and local branches has same names';
+        return 'Checking that the remote and local branches has same names';
     }
 
     /**

@@ -10,7 +10,7 @@ class hook10_apply_migrations extends DeployCommandHook {
      */
     public function getTitle()
     {
-        return 'Check and apply migrations by bitrix module reduce-migrations';
+        return 'Checking and applying migrations by bitrix module reduce-migrations';
     }
 
     /**
