@@ -88,9 +88,11 @@ class DeployCommand extends Command
 
         try {
             $result = $func();
-            if (strlen($result)) {
+            if (!is_null($result) && $result !== false) {
                 $output->writeln('<comment>'. $result .'</comment>');
-            } else {
+            }
+
+            if (is_null($result)) {
                 $output->writeln('<info>ok</info>');
             }
         } catch (\Exception $e) {
