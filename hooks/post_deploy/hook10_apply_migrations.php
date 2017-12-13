@@ -23,11 +23,11 @@ class hook10_apply_migrations extends DeployCommandHook {
         $migrateTool = $cwd . "/bitrix/tools/migrate";
 
         if (!file_exists($migrateTool)) {
-            $this->setResult('module is not installed');
+            $this->setResultMessage('module is not installed');
             return;
         }
 
-        $this->setResult(false);
+        $this->setResultMessage(false);
 
         $output = clone $this->getOutput();
         $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);

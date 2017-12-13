@@ -60,7 +60,7 @@ abstract class DeployCommandHook
     /**
      * @param string $result
      */
-    protected function setResult($result)
+    protected function setResultMessage($result)
     {
         $this->result = $result;
     }
