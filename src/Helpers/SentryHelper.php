@@ -2,6 +2,7 @@
 
 namespace WS\DeploymentAssistant\Helpers;
 use Raven_Client;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Helper\Helper;
 
 /**
@@ -35,10 +36,15 @@ class SentryHelper extends Helper
 
     /**
      * SentryHelper constructor.
-     * @param string $dsn
+     * @param $config $dsn
+     * @throws \Symfony\Component\Console\Exception\RuntimeException
      */
-    public function __construct($dsn)
+    public function __construct($config)
     {
-        $this->client = new Raven_Client($dsn);
+        if (empty($config) || empty($config["dsn"])) {
+            throw new RuntimeException('config sentry.dsn is not set');
+        }
+
+        $this->client = new Raven_Client($config["dsn"]);
     }
 }

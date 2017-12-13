@@ -1,115 +1,121 @@
 # Deployment assistant
 [![Build Status](https://travis-ci.org/worksolutions/deployment-assistant.svg?branch=master)](https://travis-ci.org/worksolutions/deployment-assistant)
 
-[Russian](README.ru.md)
+Помощник безопасного развертывания с git на боевом сервере.
 
-Assistant for safe deployment on production server.
+## Цель
 
-## Goal
+Обеспечить процесс безопасного развертывания для начинающих разработчиков
+компании. Устранить ситуации, в которых боевой сервер оказывается в нерабочем 
+состоянии из-за конфликтов при развертывании очередного релиза.
 
-Provide a safe deployment process for new Company's developers. 
-Prevents the production server from crushing when deploying the next release.
+### Список возможных состояний, которые может обработать ассистент
 
-### A list of possible cases witch the assistant can handle
+#### Имена удаленной и локальной веток отличаются
 
-#### There are uncommitted changes on the production server
+В этом случае разработчику задается вопрос, действительно ли он хочет продолжать:
 
-In this case, the developer will receive a deployment error message:
+>Local branch and remote branch has different names. Continue?
+
+Если имя ветки передано осозанно, то разработчику следует ответить `Y`
+Если же разработчик ошибся с именем – ему следует ответить `N`, процесс деплоя будет прекращен. 
+
+#### Есть незафиксированные измененения на боевом сервере
+
+В этом случае разработчику будет возвращено сообщение об ошибке развертывания:
 
 >Work dir is not clean. Please commit changes
 
-The developer must commit the changes on the production server then 
-push them to the remote repository and retry the deployment
+Разработчик должен зафиксировать изменения на боевом сервере, вытолкнуть их в удаленный репозиторий
+и повторить попытку развертывания
 
-#### Remote repository and production server branches are both changed
+#### Удаленный репозиторий и боевой сервер имеют изменения
 
-In this case, the developer will receive a deployment error message:
+В этом случае разработчику будет возвращено сообщение об ошибке развертывания:
 
 >The local branch and remote branch are both modified.
 >There is risk of conflicts while deploying. 
->    
+>   
 >Please push production changes to remote branch with force parameter, then pull changes locally, 
 >then resolve conflicts and try to deploy again.
 
-This situation can cause conflicts. Resolution:
+Данная ситуация может привести к возникновлению конфликтов. Порядок решения:
 
-- Make sure that the developer has the latest version of the changes 
-on the local computer that he wants to deploy on the production server.
-- Push the changes from production server to the remote repository with the -f (force) flag wiping the developer's changes in the repository
-- Pull changes from the production server locally and resolve conflicts if they appeared
-- Push changes from the local computer to the remote repository
-- Try to deploy again 
+- Убедиться, что разработчик имеет на локальном компьютере последнюю версию изменений, 
+которые хочет развернуть на боевом сервере.
+- Вытолкнуть изменения из боевого сервера в удаленный репозиторий с флагом -f (force) затирая изменения разработчика в репозитории
+- Принять изменения с боевого сервера локально и решить конфликты, если они возникли
+- Вытокнуть изменения из локального компьютера в удаленный репозиторий
+- Повторить попытку развертывания 
  
- 
-#### Changes from the production server are not pushed to the remote repository
 
-In this case, the developer will receive a deployment error message:
+#### Изменения с боевого сервера не вытолкнуты в удаленный репозиторий
+
+В этом случае разработчику будет возвращено сообщение об ошибке развертывания:
 
 >Your local branch is ahead of remote branch. Please push your changes to remote
 
-The developer must push the changes from the production server to 
-the remote repository and try to deploy again
+Разработчик должен вытолкнуть изменения с боевого сервера в удаленный репозиторий
+и повторить попытку развертывания
 
-#### There is nothing to deploy
+#### Нет изменений для развертывания
 
-In this case, the developer will receive a deployment error message:
+В этом случае разработчику будет возвращено сообщение об ошибке развертывания:
 
 >There are nothing to pull
 
-The developer must push the changes from the local computer 
-to the remote repository and try to deploy again
+Разработчик должен вытолкнуть изменения с локального компьютера в удаленный репозиторий
+и повторить попытку развертывания
 
-## Install
+## Установка
 
-Assistant is an executable phar-archive.
-To install enter the command:
+Помощник является исполняемым phar-архивом.
+Для установки введите команду:
 
 ```bash
 php -r "copy('http://dep.worksolutions.ru/dep.phar', 'dep.phar');"
 chmod +x ./dep.phar
 ```
 
-Assistant phar-archive is downloaded and saved in your current directory.
+Phar-архив помощника скачается и сохранится в вашей текущей директории.
 
-Assistant supports php versions from 5.3 to 7.1
+Помощник поддерживает версии php от 5.3 до 7.1
 
-## Usage
+## Использование
 
-### Deploy
+### Развертывание
 
-Deployment command will check the state of the production and remote branches.
-After a successful check, you will receive the changes at the production branch.
+Команда развертывания проверит состояние локальной и удаленной веток.
+После успешной проверки выполнит получение изменений из удаленной в локальную ветку.
 
-
-Syntax for the deployment command is:
+Синтаксис команды развертывания:
 
 ```bash
 php ./dep.phar deploy [<remote>] [<branch>]
 ```
 
-To start deployment type:
+Для запуска процесса развертывания введите:
 
 ```bash
 php ./dep.phar deploy
 ```
 
-By default, changes will pull from the remote branch `origin/master`, 
-to change it is required to specify from which branch of the remote source 
-you need to pull the changes:
+По умолчанию изменения вытянутся из удаленной ветки `origin/master`, 
+чтобы изменить требуется указать из какой ветки удаленного источника
+нужно вытянуть изменения:
 
 ```bash
 php ./dep.phar deploy origin master
 ```
 
-### Update
+### Обновление
 
-Update command will check if there is a new version of the assistant and 
-if there is one, it will update it.
+Команда обновления проверит есть ли новая версия помощника и, если есть – обновит его.
 
 ```bash
 php ./dep.phar self-update
 ```
 
-## Contributing
+## Внести вклад
 
-To contribute to the assistant - send pull-requests.
+Чтобы внести вклад в инструмент – используйте пул-реквесты.

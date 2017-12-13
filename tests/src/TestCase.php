@@ -1,9 +1,9 @@
 <?php
 namespace WS\DeploymentAssistant\Tests;
 
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\StreamOutput;
-use WS\DeploymentAssistant\Tests\Helpers\Cmd;
 use \WS\DeploymentAssistant\Application;
 
 /**
@@ -21,7 +21,10 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         $application->setAutoExit(false);
 
         $fp = tmpfile();
+
         $input = new StringInput($command);
+        $input->setInteractive(false);
+
         $output = new StreamOutput($fp);
 
         $application->run($input, $output);
