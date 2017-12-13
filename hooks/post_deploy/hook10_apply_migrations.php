@@ -35,7 +35,7 @@ class hook10_apply_migrations extends DeployCommandHook {
         $this->getOutput()->writeln('');
         $this->getExecHelper()->exec(
             $output,
-            'php ' . $migrateTool . ' apply -f --skip-optional',
+            'php ' . $migrateTool . ' apply -f',
             null,
             null,
             OutputInterface::VERBOSITY_QUIET
