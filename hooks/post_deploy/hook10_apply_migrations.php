@@ -1,5 +1,6 @@
 <?php
 
+use Symfony\Component\Console\Output\OutputInterface;
 use WS\DeploymentAssistant\Commands\DeployCommand\DeployCommandHook;
 
 class hook10_apply_migrations extends DeployCommandHook {
@@ -13,7 +14,7 @@ class hook10_apply_migrations extends DeployCommandHook {
     }
 
     /**
-     * @return void
+     * @return string|void
      * @throws \WS\DeploymentAssistant\RuntimeException
      */
     public function run()
@@ -21,8 +22,17 @@ class hook10_apply_migrations extends DeployCommandHook {
         $cwd = getcwd();
         $migrateTool = $cwd . "/bitrix/module/tools/migrate";
 
-        if (file_exists($migrateTool)) {
-            $this->execCmd('php ' . $migrateTool . ' apply -f --skip-optional');
+        if (!file_exists($migrateTool)) {
+            $this->setResult('module is not installed');
+            return;
         }
+
+        $this->getOutput()->writeln('');
+        $this->execCmd(
+            'php ' . $migrateTool . ' apply -f --skip-optional',
+            null,
+            null,
+            OutputInterface::VERBOSITY_NORMAL
+        );
     }
 }

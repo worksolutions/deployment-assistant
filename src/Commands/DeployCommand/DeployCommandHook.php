@@ -22,6 +22,8 @@ abstract class DeployCommandHook
     private $input;
     /** @var OutputInterface */
     private $output;
+    /** @var string */
+    private $result;
 
     /**
      * @return string
@@ -45,6 +47,22 @@ abstract class DeployCommandHook
     public function setHelperSet(HelperSet $helperSet)
     {
         $this->helperSet = $helperSet;
+    }
+
+    /**
+     * @return string
+     */
+    public function getResult()
+    {
+        return $this->result;
+    }
+
+    /**
+     * @param string $result
+     */
+    protected function setResult($result)
+    {
+        $this->result = $result;
     }
 
     /**

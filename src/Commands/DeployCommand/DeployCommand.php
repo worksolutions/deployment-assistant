@@ -87,8 +87,12 @@ class DeployCommand extends Command
         $output->write("{$message}...");
 
         try {
-            $func();
-            $output->writeln('<info>ok</info>');
+            $result = $func();
+            if (strlen($result)) {
+                $output->writeln('<comment>'. $result .'</comment>');
+            } else {
+                $output->writeln('<info>ok</info>');
+            }
         } catch (\Exception $e) {
             $output->writeln('<error>fatal</error>');
             /** @noinspection PhpUnhandledExceptionInspection */
@@ -153,6 +157,8 @@ class DeployCommand extends Command
 
         $this->doPart($output, $hook->getTitle(), function () use ($hook) {
             $hook->run();
+
+            return $hook->getResult();
         });
     }
 }
