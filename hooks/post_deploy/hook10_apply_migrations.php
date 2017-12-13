@@ -32,7 +32,7 @@ class hook10_apply_migrations extends DeployCommandHook {
             'php ' . $migrateTool . ' apply -f --skip-optional',
             null,
             null,
-            OutputInterface::VERBOSITY_NORMAL
+            OutputInterface::VERBOSITY_VERY_VERBOSE
         );
     }
 }
