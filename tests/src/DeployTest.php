@@ -41,7 +41,7 @@ class DeployTest extends TestCase
     public function testCheckLocalAndRemoteBranchHasSameNames()
     {
         $output = $this->runCommand('deploy origin dev');
-        $this->assertContains('Checking is remote and local branches has same names...fatal', $output);
+        $this->assertContains('Checking that the remote and local branches has same names...fatal', $output);
     }
 
     public function testCheckThatWorkDirHasNoChanges()
