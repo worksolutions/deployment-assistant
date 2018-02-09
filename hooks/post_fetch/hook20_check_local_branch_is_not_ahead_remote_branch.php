@@ -40,9 +40,22 @@ class hook20_check_local_branch_is_not_ahead_remote_branch extends DeployCommand
     public function isLocalRepoAheadRemoteRepo($remoteName, $remoteBranch)
     {
         $currentBranch = $this->getCurrentBranch();
-        $result = trim($this->execCmd(
-            "git rev-list --left-right --count {$currentBranch}...{$remoteName}/{$remoteBranch}"));
-        $result = explode("\t", $result);
+        $output = trim($this->execCmd(
+            "git rev-list --left-right {$currentBranch}...{$remoteName}/{$remoteBranch}")
+        );
+
+        $result = [0, 0];
+        if (!empty($output)) {
+            $items = explode(PHP_EOL, $output);
+            foreach ($items as $item) {
+                if ($item[0] === '<') {
+                    $result[0]++;
+                }
+                if ($item[0] === '>') {
+                    $result[1]++;
+                }
+            }
+        }
 
         return (bool) $result[0] && !(bool)$result[1];
     }

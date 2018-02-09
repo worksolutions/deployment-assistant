@@ -40,9 +40,22 @@ then resolve conflicts and try to deploy again.');
     private function isLocalBranchAndRemoteBranchBothModified($remoteName, $branchName)
     {
         $currentBranch = $this->getCurrentBranch();
-        $result = trim($this->execCmd(
-            "git rev-list --left-right --count {$currentBranch}...{$remoteName}/{$branchName}"));
-        $result = explode("\t", $result);
+        $output = trim($this->execCmd(
+            "git rev-list --left-right {$currentBranch}...{$remoteName}/{$branchName}")
+        );
+
+        $result = [0, 0];
+        if (!empty($output)) {
+            $items = explode(PHP_EOL, $output);
+            foreach ($items as $item) {
+                if ($item[0] === '<') {
+                    $result[0]++;
+                }
+                if ($item[0] === '>') {
+                    $result[1]++;
+                }
+            }
+        }
 
         return (bool) $result[0] && (bool) $result[1];
     }
