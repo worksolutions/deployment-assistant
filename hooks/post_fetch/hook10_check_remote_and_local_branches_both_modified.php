@@ -44,7 +44,7 @@ then resolve conflicts and try to deploy again.');
             "git rev-list --left-right {$currentBranch}...{$remoteName}/{$branchName}")
         );
 
-        $result = [0, 0];
+        $result = array(0, 0);
         if (!empty($output)) {
             $items = explode(PHP_EOL, $output);
             foreach ($items as $item) {

@@ -44,7 +44,7 @@ class hook20_check_local_branch_is_not_ahead_remote_branch extends DeployCommand
             "git rev-list --left-right {$currentBranch}...{$remoteName}/{$remoteBranch}")
         );
 
-        $result = [0, 0];
+        $result = array(0, 0);
         if (!empty($output)) {
             $items = explode(PHP_EOL, $output);
             foreach ($items as $item) {
