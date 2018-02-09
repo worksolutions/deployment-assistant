@@ -39,9 +39,22 @@ class hook30_check_local_branch_is_behind_remote_branch extends DeployCommandHoo
     public function isLocalRepoBehindOfRemoteRepo($remoteName, $remoteBranch)
     {
         $currentBranch = $this->getCurrentBranch();
-        $result = trim($this->execCmd(
-            "git rev-list --left-right --count {$currentBranch}...{$remoteName}/{$remoteBranch}"));
-        $result = explode("\t", $result);
+        $output = trim($this->execCmd(
+            "git rev-list --left-right {$currentBranch}...{$remoteName}/{$remoteBranch}")
+        );
+
+        $result = [0, 0];
+        if (!empty($output)) {
+            $items = explode(PHP_EOL, $output);
+            foreach ($items as $item) {
+                if ($item[0] === '<') {
+                    $result[0]++;
+                }
+                if ($item[0] === '>') {
+                    $result[1]++;
+                }
+            }
+        }
 
         return !(bool) $result[0] && (bool) $result[1];
     }
