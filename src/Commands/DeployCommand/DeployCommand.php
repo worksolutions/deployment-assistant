@@ -88,11 +88,11 @@ class DeployCommand extends Command
 
         try {
             $result = $func();
-            if (!is_null($result) && $result !== false) {
+            if (null !== $result && $result !== false) {
                 $output->writeln('<comment>'. $result .'</comment>');
             }
 
-            if (is_null($result)) {
+            if (null === $result) {
                 $output->writeln('<info>ok</info>');
             }
         } catch (\Exception $e) {
@@ -120,7 +120,9 @@ class DeployCommand extends Command
                 continue;
             }
 
-            if ($file->getExtension() !== "php") {
+            $pathInfo = pathinfo($file->getPathname());
+
+            if ($pathInfo['extension'] !== 'php') {
                 continue;
             }
 
