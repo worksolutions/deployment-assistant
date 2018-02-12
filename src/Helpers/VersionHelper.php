@@ -79,7 +79,11 @@ class VersionHelper extends Helper
 
     public function update()
     {
+        $pharPath = $this->getPharPath();
         $newPhar = file_get_contents($this->pharUrl);
-        file_put_contents($this->getPharPath(), $newPhar);
+        $tempFileName = tempnam(sys_get_temp_dir(), '-temp.phar');
+        file_put_contents($tempFileName, $newPhar);
+
+        rename($tempFileName, $pharPath);
     }
 }
