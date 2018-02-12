@@ -10,7 +10,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use WS\DeploymentAssistant\Helpers\GitHelper;
-use WS\DeploymentAssistant\Helpers\VersionHelper;
 use WS\DeploymentAssistant\RuntimeException;
 
 /**
@@ -19,21 +18,6 @@ use WS\DeploymentAssistant\RuntimeException;
  */
 class DeployCommand extends Command
 {
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @throws InvalidArgumentException
-     * @throws LogicException
-     */
-    public function interact(InputInterface $input, OutputInterface $output)
-    {
-        /** @var VersionHelper $updateHelper */
-        $updateHelper = $this->getHelper(VersionHelper::NAME);
-        $updateHelper->showWarningIfNewVersionAvailable($output);
-
-        parent::interact($input, $output);
-    }
-
     protected function configure()
     {
         $this

@@ -5,7 +5,6 @@ namespace WS\DeploymentAssistant\Helpers;
 use Phar;
 use RuntimeException;
 use Symfony\Component\Console\Helper\Helper;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class VersionHelper
@@ -75,17 +74,6 @@ class VersionHelper extends Helper
             return $this->getLastVersion() !== $this->getCurrentVersion();
         } catch (\Exception $e) {
             return false;
-        }
-    }
-
-    /**
-     * @param OutputInterface $output
-     */
-    public function showWarningIfNewVersionAvailable(OutputInterface $output)
-    {
-        if ($this->isNewVersionAvailable()) {
-            $output->writeln('<comment>A new version is available. Please run "dep.phar self-update" to update</comment>');
-            $output->writeln('');
         }
     }
 
