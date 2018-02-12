@@ -5,7 +5,6 @@ namespace WS\DeploymentAssistant\Helpers;
 use Phar;
 use RuntimeException;
 use Symfony\Component\Console\Helper\Helper;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class VersionHelper
@@ -78,20 +77,13 @@ class VersionHelper extends Helper
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     */
-    public function showWarningIfNewVersionAvailable(OutputInterface $output)
-    {
-        if ($this->isNewVersionAvailable()) {
-            $output->writeln('<comment>A new version is available. Please run "dep.phar self-update" to update</comment>');
-            $output->writeln('');
-        }
-    }
-
     public function update()
     {
+        $pharPath = $this->getPharPath();
         $newPhar = file_get_contents($this->pharUrl);
-        file_put_contents($this->getPharPath(), $newPhar);
+        $tempFileName = tempnam(sys_get_temp_dir(), '-temp.phar');
+        file_put_contents($tempFileName, $newPhar);
+
+        rename($tempFileName, $pharPath);
     }
 }
